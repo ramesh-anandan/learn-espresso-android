@@ -20,8 +20,8 @@ dependencies:
     - sudo pip install -U crcmod
 
   post:
-    - ./gradlew :app:assembleDebug -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx2048m -Xmx2048m" -Dorg.gradle.daemon=false
-    - ./gradlew :app:assembleAndroidTest -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx2048m -Xmx2048m" -Dorg.gradle.daemon=false
+    - if [ -e ./gradlew ]; then ./gradlew :app:assembleDebug -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx2048m -Xmx2048m" -Dorg.gradle.daemon=false;else gradle :app:assembleDebug -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx2048m -Xmx2048m" -Dorg.gradle.daemon=false;fi
+    - if [ -e ./gradlew ]; then ./gradlew :app:assembleAndroidTest -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx2048m -Xmx2048m" -Dorg.gradle.daemon=false;else gradle :app:assembleAndroidTest -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx2048m -Xmx2048m" -Dorg.gradle.daemon=false;fi
     - echo $GCLOUD_SERVICE_KEY | base64 --decode > ${HOME}/client-secret.json
     - sudo /opt/google-cloud-sdk/bin/gcloud config set project learn-espresso
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
