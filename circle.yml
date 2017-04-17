@@ -8,6 +8,8 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter "build-tools-25.0.2"
     - echo y | android update sdk --no-ui --all --filter "android-25"
     - echo y | android update sdk --no-ui --all --filter "extra-android-support"
+    - echo y | android update sdk --no-ui --all --filter "extra-google-google_play_services"
+    - echo y | android update sdk --no-ui --all --filter "extra-google-m2repository"
     - echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"
     - sudo pip install -U crcmod
 
@@ -15,7 +17,7 @@ dependencies:
     - ./gradlew :app:assembleDebug -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms1024m -Xmx1024m" -Dorg.gradle.daemon=false
     - ./gradlew :app:assembleAndroidTest -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms1024m -Xmx1024m" -Dorg.gradle.daemon=false
     - echo $GCLOUD_SERVICE_KEY | base64 --decode > ${HOME}/client-secret.json
-    - sudo /opt/google-cloud-sdk/bin/gcloud config set project golf-fix-finder-1a9ff
+    - sudo /opt/google-cloud-sdk/bin/gcloud config set project learn-espresso
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components install beta
     - sudo apt-get update
@@ -25,10 +27,17 @@ dependencies:
     - curl https://sdk.cloud.google.com | bash
     - source ~/.bashrc
     - export CLOUDSDK_CORE_DISABLE_PROMPTS=0
-    - sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/client-secret.json sendittoramesh@gmail.com
+    - sudo /opt/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file ${HOME}/client-secret.json ramesh.anandhan@gmail.com
 
 test:
    override:
       - echo "y" | sudo /opt/google-cloud-sdk/bin/gcloud beta test android run --app app/build/outputs/apk/app-debug.apk --test app/build/outputs/apk/app-debug-androidTest-unaligned.apk --results-bucket cloud-test-golf-fix-finder-1a9ff
    post:
       - sudo /opt/google-cloud-sdk/bin/gsutil -m cp -r -U 'sudo /opt/google-cloud-sdk/bin/gsutil ls gs://cloud-test-circle-ctl-test | tail -1' $CIRCLE_ARTIFACTS/ | true
+
+#deployment:
+#  production:
+#    branch: master
+#    commands:
+#     - ./gradlew assembleStaging crashlyticsUploadDistributionStaging
+#     - ./gradlew assembleRelease crashlyticsUploadDistributionRelease
