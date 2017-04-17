@@ -1,21 +1,27 @@
 machine:
   java:
     version: openjdk8
+  environment:
+    PATH: "~/$CIRCLE_PROJECT_REPONAME/gradle-3.3/bin:$PATH"
+
+general:
+  artifacts:
+      - ./app/build/outputs/apk/
 
 dependencies:
   pre:
+    - wget "https://services.gradle.org/distributions/gradle-3.3-bin.zip"; unzip gradle-3.3-bin.zip
     - echo y | android update sdk --no-ui --all --filter "tools"
     - echo y | android update sdk --no-ui --all --filter "build-tools-25.0.2"
+    - echo y | android update sdk --no-ui --all --filter "platform-tools"
     - echo y | android update sdk --no-ui --all --filter "android-25"
     - echo y | android update sdk --no-ui --all --filter "extra-android-support"
-    - echo y | android update sdk --no-ui --all --filter "extra-google-google_play_services"
-    - echo y | android update sdk --no-ui --all --filter "extra-google-m2repository"
     - echo y | android update sdk --no-ui --all --filter "extra-android-m2repository"
     - sudo pip install -U crcmod
 
   post:
-    - ./gradlew :app:assembleDebug -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms1024m -Xmx1024m" -Dorg.gradle.daemon=false
-    - ./gradlew :app:assembleAndroidTest -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xms1024m -Xmx1024m" -Dorg.gradle.daemon=false
+    - ./gradlew :app:assembleDebug -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx2048m -Xmx2048m" -Dorg.gradle.daemon=false
+    - ./gradlew :app:assembleAndroidTest -PdisablePreDex -i -s -Pcom.android.build.threadPoolSize=1 -Dorg.gradle.parallel=false -Dorg.gradle.jvmargs="-Xmx2048m -Xmx2048m" -Dorg.gradle.daemon=false
     - echo $GCLOUD_SERVICE_KEY | base64 --decode > ${HOME}/client-secret.json
     - sudo /opt/google-cloud-sdk/bin/gcloud config set project learn-espresso
     - sudo /opt/google-cloud-sdk/bin/gcloud --quiet components update
